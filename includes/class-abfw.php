@@ -553,13 +553,6 @@ class ABFW_Address_Book {
 		$address_names = get_user_meta( $user_id, 'wc_address_book_' . $type, true );
 		if ( empty( $address_names ) ) {
 			if ( 'shipping' === $type ) {
-				// Check for shipping addresses saved in pre 2.0 format.
-				$address_names = get_user_meta( $user_id, 'wc_address_book', true );
-				if ( is_array( $address_names ) ) {
-					// Save addresses in the new format.
-					$this->save_address_names( $user_id, $address_names, 'shipping' );
-					return $address_names;
-				}
 				$shipping_address = get_user_meta( $user_id, 'shipping_address_1', true );
 				// Return just a default shipping address if no other addresses are saved.
 				if ( ! empty( $shipping_address ) ) {
@@ -604,6 +597,7 @@ class ABFW_Address_Book {
 		$address_names = $this->get_address_names( $user_id, $type );
 
 		$address_fields = WC()->countries->get_address_fields( $country, $type . '_' );
+		// $address_fields = WC()->countries->get_address_fields( $country, 'billing_' );
 
 		// Get the set address fields, including any custom values.
 		$address_keys = array_keys( $address_fields );
@@ -829,21 +823,27 @@ class ABFW_Address_Book {
 			die( 'no address passed' );
 		}
 
+
 		$alt_address_name = sanitize_text_field( wp_unslash( $_POST['name'] ) );
 		$type             = $this->get_address_type( $alt_address_name );
-		$address_book     = $this->get_address_book( $customer_id, $type );
+		$address_book     = $this->get_address_book( $customer_id, $type ); 
 
-		$primary_address_name = $type;
+		$target_type = sanitize_text_field( $_POST['target_type'] ); 
+		$target_address_book = $this->get_address_book($customer_id, $target_type);
+
+		$primary_address_name = $target_type;
 
 		// Loop through and swap values between names.
-		foreach ( $address_book[ $primary_address_name ] as $field => $value ) {
+		//make current alternate field into primary
+		foreach ( $target_address_book[ $primary_address_name ] as $field => $value ) {
 			$alt_field = preg_replace( '/^[^_]*_\s*/', $alt_address_name . '_', $field );
 			update_user_meta( $customer_id, $field, $address_book[ $alt_address_name ][ $alt_field ] );
 		}
 
+		//make current primary into alternate
 		foreach ( $address_book[ $alt_address_name ] as $field => $value ) {
 			$primary_field = preg_replace( '/^[^_]*_\s*/', $primary_address_name . '_', $field );
-			update_user_meta( $customer_id, $field, $address_book[ $primary_address_name ][ $primary_field ] );
+			update_user_meta( $customer_id, $field, $target_address_book[ $primary_address_name ][ $primary_field ] );
 		}
 
 		die();

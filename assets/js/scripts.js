@@ -126,11 +126,12 @@ var woo_address_book_app = {
 			e.preventDefault();
 
 			var name = $( this ).attr( 'id' );
-			var type = name.replace( /\d+/g, '' );
+			// var type = name.replace( /\d+/g, '' );
+			var target_type = $(this).attr('data-type');
 
-			if ( type === 'billing' ) {
+			if ( target_type === 'billing' ) {
 				var primary_address = $( '.u-column1.woocommerce-Address address' );
-			} else if ( type === 'shipping' ) {
+			} else if ( target_type === 'shipping' ) {
 				var primary_address = $( '.u-column2.woocommerce-Address address' );
 			} else {
 				return;
@@ -152,6 +153,7 @@ var woo_address_book_app = {
 					action: 'wc_address_book_make_primary',
 					name: name,
 					nonce: woo_address_book.primary_security,
+					target_type: target_type
 				},
 				success: function () {
 					alt_address.html( pa_html );
