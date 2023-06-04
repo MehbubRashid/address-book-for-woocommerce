@@ -631,7 +631,13 @@ class ABFW_Address_Book {
 	public function get_combined_address_book($user_id) {
 		$billing = $this->get_address_book($user_id, 'billing');
 		$shipping = $this->get_address_book($user_id, 'shipping');
-		return array_merge($billing, $shipping);
+		$merged = array_merge($billing, $shipping);
+		$address_book_keys = array_unique(array_keys($merged));
+		$address_book = array();
+		foreach ($address_book_keys as $key) {
+			$address_book[$key] = $merged[$key];
+		}
+		return $address_book;
 	}
 
 	/**
@@ -666,12 +672,8 @@ class ABFW_Address_Book {
 		if ( is_user_logged_in() ) {
 			foreach ( $fields as $type => $address_fields ) {
 				if ( ( 'billing' === $type  ||  'shipping' === $type ) ) {
-					$combined_book = $this->get_combined_address_book( null );
-					$address_book_keys = array_unique(array_keys($combined_book));
-					$address_book = array();
-					foreach ($address_book_keys as $key) {
-						$address_book[$key] = $combined_book[$key];
-					}
+					$address_book = $this->get_combined_address_book( null );
+					
 					$under_limit  = $this->limit_saved_addresses( $type );
 
 					$select_type = 'select';
@@ -883,7 +885,7 @@ class ABFW_Address_Book {
 			$type = 'shipping';
 		}
 
-		$address_book = $this->get_address_book( null, $type );
+		$address_book = $this->get_combined_address_book( null );
 
 		if ( 'billing' === $type ) {
 			$countries = $woocommerce->countries->get_allowed_countries();
