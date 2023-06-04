@@ -18,6 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
 
+// update_user_meta(get_current_user_id(), 'wc_address_book_billing', array());
+// update_user_meta(get_current_user_id(), 'wc_address_book_shipping', array());
+
 $wc_address_book = ABFW_Address_Book::get_instance();
 
 $abfw_address_book_customer_id           = get_current_user_id();
