@@ -156,7 +156,17 @@ var woo_address_book_app = {
 					target_type: target_type
 				},
 				success: function () {
-					alt_address.html( pa_html );
+					if ( pa_html.trim() !== 'You have not set up this type of address yet.' ) {
+
+						alt_address.html( pa_html );
+					}
+					else {
+						alt_address.closest('.wc-address-book-address').remove();
+
+						// change the "add" text to "edit"
+						primary_address.closest('.woocommerce-Address').find('.woocommerce-Address-title a').text('Edit');
+					}
+
 					primary_address.html( aa_html );
 
 					// Remove BlockUI overlay

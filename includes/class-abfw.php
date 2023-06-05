@@ -627,6 +627,59 @@ class ABFW_Address_Book {
 		return apply_filters( 'wc_address_book_addresses', $address_book );
 	}
 
+	/**
+	 * Returns an array of the customer's addresses with field values.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @param int    $user_id - User's ID.
+	 * @param string $type - 'billing' or 'shipping'.
+	 * @return array
+	 */
+	public function create_shipping_address_book() {
+		$countries = new WC_Countries();
+
+		if ( ! isset( $country ) ) {
+			$country = $countries->get_base_country();
+		}
+		
+		$user_id = get_current_user_id();
+
+		$address_names = array('shipping');
+
+		$type = 'shipping';
+
+		$address_fields = WC()->countries->get_address_fields( $country, $type . '_' );
+		// $address_fields = WC()->countries->get_address_fields( $country, 'billing_' );
+
+		// Get the set address fields, including any custom values.
+		$address_keys = array_keys( $address_fields );
+
+		$address_book = array();
+
+		if ( ! empty( $address_names ) ) {
+			foreach ( $address_names as $name ) {
+				if ( strpos( $name, $type ) === false ) {
+					continue;
+				}
+
+				$address = array();
+
+				foreach ( $address_keys as $field ) {
+
+					// Remove the default name so the custom ones can be added.
+					$field = str_replace( $type, '', $field );
+
+					$address[ $name . $field ] = get_user_meta( $user_id, $name . $field, true );
+				}
+
+				$address_book[ $name ] = $address;
+			}
+		}
+
+		return $address_book;
+	}
+
 
 	public function get_combined_address_book($user_id) {
 		$billing = $this->get_address_book($user_id, 'billing');
@@ -839,9 +892,24 @@ class ABFW_Address_Book {
 
 		// Loop through and swap values between names.
 		//make current alternate field into primary
-		foreach ( $target_address_book[ $primary_address_name ] as $field => $value ) {
-			$alt_field = preg_replace( '/^[^_]*_\s*/', $alt_address_name . '_', $field );
-			update_user_meta( $customer_id, $field, $address_book[ $alt_address_name ][ $alt_field ] );
+		if ( isset( $target_address_book[$primary_address_name] ) ) {
+
+			foreach ( $target_address_book[ $primary_address_name ] as $field => $value ) {
+				$alt_field = preg_replace( '/^[^_]*_\s*/', $alt_address_name . '_', $field );
+				update_user_meta( $customer_id, $field, $address_book[ $alt_address_name ][ $alt_field ] );
+			}
+		}
+		else {
+			// we are trying to make an address primary where a previous primary address
+			// doesnt exist already
+			// we will only allow this action if the target type is shipping
+			if ( $target_type === 'shipping' ) {
+				$dummy_book = $this->create_shipping_address_book();
+				foreach ( $dummy_book['shipping'] as $field => $value ) {
+					$alt_field = preg_replace( '/^[^_]*_\s*/', $alt_address_name . '_', $field );
+					update_user_meta( $customer_id, $field, $address_book[ $alt_address_name ][ $alt_field ] );
+				}
+			}
 		}
 
 		//make current primary into alternate
