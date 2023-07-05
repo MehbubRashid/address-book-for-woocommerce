@@ -724,7 +724,7 @@ class ABFW_Address_Book {
 	public function checkout_address_select_field( $fields ) {
 		if ( is_user_logged_in() ) {
 			foreach ( $fields as $type => $address_fields ) {
-				if ( ( 'billing' === $type  ||  'shipping' === $type ) ) {
+				if ( ( 'shipping' === $type ) ) {
 					$address_book = $this->get_combined_address_book( null );
 					
 					$under_limit  = $this->limit_saved_addresses( $type );

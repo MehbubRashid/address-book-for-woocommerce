@@ -79,15 +79,20 @@ if ( ! $type ) {
 						?>
 
 						<div class="wc-address-book-address">
-							<div class="wc-address-book-meta">
-								<a href="<?php echo esc_url( $wc_address_book->get_address_book_endpoint_url( $abfw_address_book_name, 'billing' ) ); ?>" class="wc-address-book-edit"><?php echo esc_attr__( 'Edit', 'address-book-for-woocommerce' ); ?></a>
-								<a id="<?php echo esc_attr( $abfw_address_book_name ); ?>" class="wc-address-book-delete"><?php echo esc_attr__( 'Delete', 'address-book-for-woocommerce' ); ?></a>
-								<a data-type="billing" id="<?php echo esc_attr( $abfw_address_book_name ); ?>" class="wc-address-book-make-primary"><?php echo esc_attr__( 'Set as Default Billing Address', 'address-book-for-woocommerce' ); ?></a>
-								<a data-type="shipping" id="<?php echo esc_attr( $abfw_address_book_name ); ?>" class="wc-address-book-make-primary"><?php echo esc_attr__( 'Set as Default Shipping Address', 'address-book-for-woocommerce' ); ?></a>
-							</div>
 							<address>
 								<?php echo wp_kses( $abfw_address_book_formatted_address, array( 'br' => array() ) ); ?>
+								<br>
+								<?php echo get_user_meta( $abfw_address_book_customer_id, $abfw_address_book_name . '_phone', true ); ?>
 							</address>
+							<div class="wc-address-book-meta">
+								<a href="<?php echo esc_url( $wc_address_book->get_address_book_endpoint_url( $abfw_address_book_name, 'billing' ) ); ?>" class="wc-address-book-edit"><?php echo esc_attr__( 'Edit', 'address-book-for-woocommerce' ); ?></a>
+								<span>|</span>
+								<a id="<?php echo esc_attr( $abfw_address_book_name ); ?>" class="wc-address-book-delete"><?php echo esc_attr__( 'Delete', 'address-book-for-woocommerce' ); ?></a>
+								<span>|</span>
+								<a data-type="billing" id="<?php echo esc_attr( $abfw_address_book_name ); ?>" class="wc-address-book-make-primary"><?php echo esc_attr__( 'Set as Default Billing Address', 'address-book-for-woocommerce' ); ?></a>
+								<span>|</span>
+								<a data-type="shipping" id="<?php echo esc_attr( $abfw_address_book_name ); ?>" class="wc-address-book-make-primary"><?php echo esc_attr__( 'Set as Default Shipping Address', 'address-book-for-woocommerce' ); ?></a>
+							</div>
 						</div>
 
 						<?php
