@@ -44,7 +44,7 @@ class Abfw_Plugin {
 		if ( defined( 'ABFW_VERSION' ) ) {
 			$this->version = ABFW_VERSION;
 		} else {
-			$this->version = '1.0.0';
+			$this->version = '1.0.0'; 
 		}
 		$this->plugin_name = 'address-book-for-woocommerce';
 
